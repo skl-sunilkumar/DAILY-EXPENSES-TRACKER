@@ -39,9 +39,8 @@ A lightweight, installable web app to track daily transport and other expenses, 
 ├── app.js              All logic (saving, dashboard, History, PDF)
 ├── manifest.json       App install details (name, colours, icons)
 ├── service-worker.js   Offline caching
-└── icons/
-    ├── icon-192.png
-    └── icon-512.png
+├── icon-192.png        App icon
+└── icon-512.png        App icon
 ```
 
 ## Run it
@@ -55,7 +54,7 @@ A lightweight, installable web app to track daily transport and other expenses, 
 
 ## Host your own copy on GitHub Pages
 
-1. Upload all the files above to a new repository, with the `icons` folder included.
+1. Upload all the files above to a new repository. They all go in the same place, with no folders.
 2. Go to **Settings → Pages**.
 3. Under **Build and deployment**, choose **Deploy from a branch**, select `main` and `/ (root)`, then click **Save**.
 4. After a minute or two, your app is live at `https://YOUR-USERNAME.github.io/REPO-NAME/`.
