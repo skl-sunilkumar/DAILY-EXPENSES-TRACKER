@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Daily Expense Tracker</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#4f46e5">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Expenses">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>💰 Daily Expense Tracker</h1>
+  <p class="subtitle">Transport & other daily spending — all in one place</p>
+</header>
+
+<nav class="tabs">
+  <button class="tab-btn active" data-tab="dashboard">Dashboard</button>
+  <button class="tab-btn" data-tab="transport">Add Transport</button>
+  <button class="tab-btn" data-tab="other">Add Other Expense</button>
+  <button class="tab-btn" data-tab="history">History</button>
+</nav>
+
+<main class="container">
+
+  <div class="storage-note">
+    Your data is saved right in this browser on this computer (no internet or server needed). Don't clear your browser's site data for this page, or it'll be lost — and it won't automatically show up if you open this file on a different computer or browser.
+  </div>
+
+  <div class="panel" id="month-selector-panel">
+    <label style="margin-top:0;">Viewing Month</label>
+    <input type="month" id="global-month-select">
+  </div>
+
+  <!-- ================= DASHBOARD ================= -->
+  <section id="dashboard" class="tab-panel active">
+    <div class="card-grid">
+      <div class="stat-card highlight">
+        <span class="stat-label">Total Spent This Month</span>
+        <span class="stat-value" id="stat-spent">₹0</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Transport Total</span>
+        <span class="stat-value" id="stat-transport">₹0</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Other Expenses Total</span>
+        <span class="stat-value" id="stat-other">₹0</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Daily Average Spend</span>
+        <span class="stat-value" id="stat-average">₹0</span>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Breakdown by Category</h2>
+      <div id="category-bars" class="bar-list"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Transport Breakdown</h2>
+      <div id="transport-bars" class="bar-list"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Day-Wise Expenses</h2>
+      <p class="empty-note" style="margin-top:0;">Day by day spending for the selected month. Click a day to open it in History.</p>
+      <div id="daywise-grid" class="day-grid"></div>
+      <p class="empty-note" id="daywise-empty" style="display:none;">No expenses logged yet for this month.</p>
+    </div>
+
+    <div class="panel">
+      <h2>Monthly Report</h2>
+      <p class="empty-note" style="margin-top:0;">Generates a clean summary of the selected month's spending that you can save as a PDF.</p>
+      <div class="btn-row">
+        <button id="pdf-btn" type="button">📄 Download Month-End PDF</button>
+        <button id="report-btn" type="button">🖨️ Print / Save via Browser</button>
+      </div>
+      <p class="form-msg" id="pdf-msg"></p>
+    </div>
+  </section>
+
+  <!-- ================= ADD TRANSPORT ================= -->
+  <section id="transport" class="tab-panel">
+    <div class="panel narrow">
+      <h2 id="transport-form-title">Add Transport Expense</h2>
+      <div class="edit-banner hidden" id="transport-edit-banner">Editing an existing transport entry.</div>
+      <form id="transport-form" novalidate>
+        <label>Date</label>
+        <input type="date" name="expense_date">
+
+        <label>Transport Type</label>
+        <select name="transport_type" id="transport_type">
+          <option value="">-- Select --</option>
+          <option value="auto">Auto</option>
+          <option value="bike">Bike</option>
+          <option value="mofussil_bus">Mofussil Bus</option>
+          <option value="others">Others</option>
+        </select>
+
+        <div id="bus-fields" class="hidden">
+          <label>Bus Category</label>
+          <select name="bus_category" id="bus_category">
+            <option value="">-- Select --</option>
+            <option value="ac">AC</option>
+            <option value="deluxe">Deluxe</option>
+            <option value="normal">Normal</option>
+            <option value="private">Private</option>
+          </select>
+
+          <label>Bus Number</label>
+          <input type="text" name="bus_number" id="bus_number" placeholder="e.g. TN-45-AB-1234">
+        </div>
+
+        <label>Amount (₹)</label>
+        <input type="number" step="0.01" min="0" name="amount">
+
+        <label>Route (From → To)</label>
+        <select name="route" id="route_select">
+          <option value="">-- Select Route --</option>
+          <option>HOME - KPM</option>
+          <option>KPM - POONAMALLEE</option>
+          <option>POONAMALLEE - HOME 2</option>
+          <option>HOME - KUMMANACHAVADI</option>
+          <option>KUMMANACHAVADI - DGV(nsk-nagar)</option>
+          <option>KUMMANACHAVADI - DGV</option>
+          <option>DGV - KUMMANACHAVADI</option>
+          <option>DGV(nsk-nagar) - KUMMANACHAVADI</option>
+          <option>KUMMANACHAVADI - HOME 2</option>
+          <option>HOME 2 - POONAMALLEE</option>
+          <option>HOME 2 - KUMMANACHAVADI</option>
+          <option>POONAMALLEE - KPM</option>
+          <option>KPM - HOME</option>
+          <option>DGV - KOYAMBEDU</option>
+          <option>DGV(nsk-nagar) - KOYAMBEDU</option>
+          <option>DGV - POONAMALLEE</option>
+          <option>DGV(nsk-nagar) - POONAMALLEE</option>
+          <option>KOYAMBEDU - KPM</option>
+          <option>KOYAMBEDU - POONAMALLEE</option>
+          <option>KOYAMBEDU - KUMMANACHAVADI</option>
+          <option>DGV - ERIKARAI</option>
+          <option>ERIKARAI - KUMMANACHAVADI</option>
+          <option value="other">OTHERS (type manually)</option>
+        </select>
+
+        <div id="custom-route-fields" class="hidden">
+          <label>From Place</label>
+          <input type="text" id="from_place" placeholder="e.g. Home">
+          <label>To Place</label>
+          <input type="text" id="to_place" placeholder="e.g. Office">
+        </div>
+
+        <label>Payment Method</label>
+        <select name="payment_source" id="payment_source">
+          <option value="">-- Select --</option>
+          <option value="cash">Cash</option>
+          <option value="gpay">G-Pay</option>
+          <option value="whatsapp_pay">WhatsApp Pay</option>
+          <option value="card">Credit/Debit Card</option>
+          <option value="netbanking">Net Banking</option>
+          <option value="chennai_one_gpay">CHENNAI ONE - GPAY</option>
+          <option value="chennai_one_whatsapp">CHENNAI ONE - WHATSAPP</option>
+          <option value="student_bus_pass">STUDENT BUS PASS</option>
+          <option value="pass_1k">Rs. 1k PASS</option>
+          <option value="bike_muthu">BIKE MUTHU</option>
+          <option value="other">OTHERS</option>
+        </select>
+
+        <label>Remarks (optional)</label>
+        <input type="text" name="remarks" id="transport_remarks" placeholder="e.g. traffic delay, shared ride">
+
+        <button type="submit" id="transport-submit">Add Transport Expense</button>
+        <button type="button" class="secondary hidden" id="transport-cancel">Cancel Edit</button>
+        <p class="form-msg" id="transport-msg"></p>
+      </form>
+    </div>
+  </section>
+
+  <!-- ================= ADD OTHER EXPENSE ================= -->
+  <section id="other" class="tab-panel">
+    <div class="panel narrow">
+      <h2 id="other-form-title">Add Other Expense</h2>
+      <div class="edit-banner hidden" id="other-edit-banner">Editing an existing expense entry.</div>
+      <form id="other-form" novalidate>
+        <label>Date</label>
+        <input type="date" name="expense_date">
+
+        <label>Category</label>
+        <select name="category" id="category">
+          <option value="">-- Select --</option>
+          <option value="food">Food</option>
+          <option value="clothes">Clothes</option>
+          <option value="stationary">Stationary</option>
+          <option value="other">Other (type below)</option>
+        </select>
+
+        <div id="custom-category-field" class="hidden">
+          <label>Specify Category</label>
+          <input type="text" id="custom_category" placeholder="e.g. groceries">
+        </div>
+
+        <label>Remarks (optional)</label>
+        <input type="text" name="description" placeholder="e.g. new shirt">
+
+        <label>Amount (₹)</label>
+        <input type="number" step="0.01" min="0" name="amount">
+
+        <label>Payment Method</label>
+        <select name="payment_source" id="other_payment_source">
+          <option value="">-- Select --</option>
+          <option value="cash">Cash</option>
+          <option value="gpay">G-Pay</option>
+          <option value="whatsapp_pay">WhatsApp Pay</option>
+          <option value="card">Credit/Debit Card</option>
+          <option value="netbanking">Net Banking</option>
+          <option value="other">Other</option>
+        </select>
+
+        <button type="submit" id="other-submit">Add Expense</button>
+        <button type="button" class="secondary hidden" id="other-cancel">Cancel Edit</button>
+        <p class="form-msg" id="other-msg"></p>
+      </form>
+    </div>
+  </section>
+
+  <!-- ================= HISTORY ================= -->
+  <section id="history" class="tab-panel">
+    <div class="panel">
+      <h2>All Expenses (this month)</h2>
+      <div class="btn-row" style="margin-bottom:14px;">
+        <label style="font-size:0.85rem;color:var(--muted);">Day filter</label>
+        <select id="history-day-filter" style="padding:8px;border-radius:8px;border:1px solid var(--border);font-family:inherit;">
+          <option value="">Whole month</option>
+        </select>
+        <button type="button" class="edit-btn" id="history-day-reset">Clear filter</button>
+      </div>
+      <div id="history-grid"></div>
+      <p class="empty-note" id="history-empty" style="display:none;">No expenses logged yet for this month.</p>
+    </div>
+  </section>
+
+</main>
+
+<div id="print-report" class="print-only"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
