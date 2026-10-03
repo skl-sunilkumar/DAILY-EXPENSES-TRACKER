@@ -2,7 +2,7 @@
 
 A lightweight, installable web app to track daily transport and other expenses, view them day by day, and export a monthly PDF report. It runs entirely in the browser with no backend, no database and no sign-up.
 
-**Live app:** https://skl-sunilkumar.github.io/REPO-NAME/
+**Live app:** https://skl-sunilkumar.github.io/DAILY-EXPENSES-TRACKER
 
 > Replace `REPO-NAME` with your repository name.
 
