@@ -1,4 +1,5 @@
-const CACHE_NAME = 'expense-tracker-cache-v2';
+// Change this number whenever you update any file, so phones pick up the new version.
+const CACHE_NAME = 'expense-tracker-cache-v3';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -25,8 +26,17 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
+// Online: always load the newest files (and refresh the saved copy).
+// Offline: fall back to the saved copy.
 self.addEventListener('fetch', (event) => {
+  if (event.request.method !== 'GET') return;
   event.respondWith(
-    caches.match(event.request).then((cached) => cached || fetch(event.request))
+    fetch(event.request)
+      .then((response) => {
+        const copy = response.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+        return response;
+      })
+      .catch(() => caches.match(event.request))
   );
 });
