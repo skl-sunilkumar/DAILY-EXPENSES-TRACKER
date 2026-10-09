@@ -1,5 +1,5 @@
 // Change this number whenever you update any file, so phones pick up the new version.
-const CACHE_NAME = 'expense-tracker-cache-v3';
+const CACHE_NAME = 'expense-tracker-cache-v4';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
