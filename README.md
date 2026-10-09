@@ -2,9 +2,7 @@
 
 A lightweight, installable web app to track daily transport and other expenses, view them day by day, and export a monthly PDF report. It runs entirely in the browser with no backend, no database and no sign-up.
 
-**Live app:** https://skl-sunilkumar.github.io/DAILY-EXPENSES-TRACKER
-
-> DAILY-EXPENSES-TRACKER
+**Live app:** https://skl-sunilkumar.github.io/DAILY-EXPENSES-TRACKER/
 
 ## Features
 
@@ -14,8 +12,9 @@ A lightweight, installable web app to track daily transport and other expenses, 
   - Day-wise expenses in a grid. Tap a day to open it in History
   - Month selector to view any month
 - **Add Transport**
-  - Types: Auto, Bike, Mofussil Bus (AC / Deluxe / Normal / Private, with bus number) and Others
-  - Preset route list, or type a custom route with OTHERS
+  - Types: Auto, Bike, Mofussil Bus (AC / Deluxe / Normal / Private, with bus number), Metro and Others
+  - **Metro:** pick the line (Green, Yellow or Blue) and type the start and end station
+  - Preset route list for other types, or type a custom route with OTHERS
   - Payment methods: Cash, G-Pay, WhatsApp Pay, Credit/Debit Card, Net Banking, CHENNAI ONE (GPay / WhatsApp), STUDENT BUS PASS, Rs. 1k PASS, BIKE MUTHU and OTHERS
   - ₹0 amount is allowed only for STUDENT BUS PASS, Rs. 1k PASS and BIKE MUTHU
 - **Add Other Expense**
@@ -26,6 +25,7 @@ A lightweight, installable web app to track daily transport and other expenses, 
 - **Monthly PDF report**
   - Landscape A4 with a month-year watermark on every page (for example `SEPT-26`)
   - Columns: DATE | TYPE | MoT / MoD | DETAILS | PAID VIA | REMARKS | AMOUNT
+  - Metro entries show the line in MoT / MoD, for example `Metro (Green Line)`
   - Includes a summary and day totals
   - A Print / Save via Browser option is also available
 - **Installable and offline**
@@ -58,6 +58,10 @@ A lightweight, installable web app to track daily transport and other expenses, 
 2. Go to **Settings → Pages**.
 3. Under **Build and deployment**, choose **Deploy from a branch**, select `main` and `/ (root)`, then click **Save**.
 4. After a minute or two, your app is live at `https://YOUR-USERNAME.github.io/REPO-NAME/`.
+
+## Updating the app
+
+When you change any file, upload it to the repo and commit. The service worker loads the newest files whenever you're online, so changes show up on the next reload. If you ever see an old version, unregister the service worker once (in Edge or Chrome: F12 → Application → Service workers → Unregister) and reload with Ctrl + Shift + R.
 
 ## Data and privacy
 
