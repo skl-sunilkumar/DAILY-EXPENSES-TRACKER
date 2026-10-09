@@ -4,7 +4,7 @@ A lightweight, installable web app to track daily transport and other expenses, 
 
 **Live app:** https://skl-sunilkumar.github.io/DAILY-EXPENSES-TRACKER
 
-> Replace `REPO-NAME` with your repository name.
+> DAILY-EXPENSES-TRACKER
 
 ## Features
 
