@@ -89,10 +89,15 @@ globalMonthSelect.addEventListener('change', () => {
 // ---------- Transport form dynamic fields ----------
 const transportType = document.getElementById('transport_type');
 const busFields = document.getElementById('bus-fields');
-transportType.addEventListener('change', () => {
-  const isBus = transportType.value === 'mofussil_bus';
-  busFields.classList.toggle('hidden', !isBus);
-});
+const metroFields = document.getElementById('metro-fields');
+const routeBlock = document.getElementById('route-block');
+function updateTransportFields() {
+  const t = transportType.value;
+  busFields.classList.toggle('hidden', t !== 'mofussil_bus');
+  metroFields.classList.toggle('hidden', t !== 'metro');
+  routeBlock.classList.toggle('hidden', t === 'metro');   // Metro uses stations instead of a route
+}
+transportType.addEventListener('change', updateTransportFields);
 
 // ---------- Route select (preset routes or manual entry) ----------
 const routeSelect = document.getElementById('route_select');
@@ -149,6 +154,9 @@ function entryParts(r) {
   let mo;
   if (isT) {
     mo = TRANSPORT_LABELS[r.detail_type] || String(r.detail_type).replace('_', ' ');
+    if (r.detail_type === 'metro' && r.metro_line) {
+      mo += ' (' + (METRO_LINES[r.metro_line] || r.metro_line) + ')';
+    }
     if (r.detail_type === 'mofussil_bus') {
       const extra = [r.bus_category ? String(r.bus_category).toUpperCase() : '', r.bus_number || ''].filter(Boolean).join(', ');
       if (extra) mo += ' (' + extra + ')';
@@ -166,7 +174,8 @@ function entryParts(r) {
     amount: r.amount
   };
 }
-const TRANSPORT_LABELS = { auto: 'Auto', bike: 'Bike', mofussil_bus: 'Mofussil Bus', others: 'Others' };
+const TRANSPORT_LABELS = { auto: 'Auto', bike: 'Bike', mofussil_bus: 'Mofussil Bus', metro: 'Metro', others: 'Others' };
+const METRO_LINES = { green: 'Green Line', yellow: 'Yellow Line', blue: 'Blue Line' };
 
 // ---------- Transport form submit (add or update) ----------
 document.getElementById('transport-form').addEventListener('submit', (e) => {
@@ -185,14 +194,25 @@ document.getElementById('transport-form').addEventListener('submit', (e) => {
     return;
   }
 
-  // ---- Route (mandatory: either a preset, or manually typed From/To) ----
+  // ---- Route (Metro: line + start/end station; others: preset or manually typed From/To) ----
   const routeValue = routeSelect.value;
   let route;
-  if (!routeValue) {
+  if (type === 'metro') {
+    const start = document.getElementById('metro_start').value.trim();
+    const end = document.getElementById('metro_end').value.trim();
+    if (!form.metro_line.value) {
+      showMsg(msg, 'Please select the metro line.', false);
+      return;
+    }
+    if (!start || !end) {
+      showMsg(msg, 'Please fill in both start and end stations.', false);
+      return;
+    }
+    route = `${start} - ${end}`;
+  } else if (!routeValue) {
     showMsg(msg, 'Please select a route.', false);
     return;
-  }
-  if (routeValue === 'other') {
+  } else if (routeValue === 'other') {
     const from = document.getElementById('from_place').value.trim();
     const to = document.getElementById('to_place').value.trim();
     if (!from || !to) {
@@ -221,6 +241,7 @@ document.getElementById('transport-form').addEventListener('submit', (e) => {
     transport_type: type,
     bus_category: type === 'mofussil_bus' ? form.bus_category.value : null,
     bus_number: type === 'mofussil_bus' ? (form.bus_number.value.trim() || null) : null,
+    metro_line: type === 'metro' ? form.metro_line.value : null,
     amount: amount,
     route: route,
     payment_source: paymentValue,
@@ -240,7 +261,7 @@ document.getElementById('transport-form').addEventListener('submit', (e) => {
   showMsg(msg, wasEdit ? 'Transport expense updated!' : 'Transport expense added!', true);
   form.reset();
   form.expense_date.value = new Date().toISOString().slice(0, 10);
-  busFields.classList.add('hidden');
+  updateTransportFields();
   customRouteFields.classList.add('hidden');
 
   if (monthOf(record.expense_date) !== selectedMonth) {
@@ -333,13 +354,22 @@ function startEdit(source, id) {
     const form = document.getElementById('transport-form');
     form.expense_date.value = r.expense_date;
     form.transport_type.value = r.transport_type;
-    busFields.classList.toggle('hidden', r.transport_type !== 'mofussil_bus');
+    updateTransportFields();
     form.bus_category.value = r.bus_category || '';
+    form.metro_line.value = r.metro_line || '';
     form.bus_number.value = r.bus_number || '';
     form.amount.value = r.amount;
 
     const preset = Array.from(routeSelect.options).some(o => o.value === r.route || o.text === r.route);
-    if (preset && r.route) {
+    if (r.transport_type === 'metro') {
+      const mp = (r.route || '').split(/\s+-\s+/);
+      document.getElementById('metro_start').value = mp[0] || '';
+      document.getElementById('metro_end').value = mp[1] || '';
+      routeSelect.value = '';
+      customRouteFields.classList.add('hidden');
+    } else if (preset && r.route) {
+      document.getElementById('metro_start').value = '';
+      document.getElementById('metro_end').value = '';
       routeSelect.value = Array.from(routeSelect.options).find(o => o.value === r.route || o.text === r.route).value;
       customRouteFields.classList.add('hidden');
     } else {
@@ -395,7 +425,7 @@ document.getElementById('transport-cancel').addEventListener('click', () => {
   const form = document.getElementById('transport-form');
   form.reset();
   form.expense_date.value = new Date().toISOString().slice(0, 10);
-  busFields.classList.add('hidden');
+  updateTransportFields();
   customRouteFields.classList.add('hidden');
   renderHistory();
   goToTab('history');
@@ -415,7 +445,7 @@ function computeMonthStats(month) {
   const monthTransport = db.transport.filter(r => monthOf(r.expense_date) === month);
   const monthOther = db.other.filter(r => monthOf(r.expense_date) === month);
 
-  const transportByType = { auto: 0, bike: 0, mofussil_bus: 0, others: 0 };
+  const transportByType = { auto: 0, bike: 0, mofussil_bus: 0, metro: 0, others: 0 };
   monthTransport.forEach(r => {
     const k = r.transport_type || 'others';
     if (transportByType[k] === undefined) transportByType[k] = 0;
